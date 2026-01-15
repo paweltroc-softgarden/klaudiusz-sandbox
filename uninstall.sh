@@ -21,18 +21,12 @@ echo -e "\n${YELLOW}╔═══════════════════
 echo -e "${YELLOW}║   Klaudiusz Sandbox Uninstaller          ║${NC}"
 echo -e "${YELLOW}╚══════════════════════════════════════════╝${NC}"
 
-echo -e "\nThis will remove:"
+echo -e "\nRemoving:"
 echo -e "  - $SANDBOX_HOME"
 echo -e "  - ~/.local/bin/klaudiusz symlink"
 echo -e "  - Docker image: $IMAGE_NAME"
 echo -e "  - $CLAUDE_HOME/.dockerignore"
-
-read -p $'\nContinue? [y/N] ' -n 1 -r
 echo ""
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo -e "\n${DIM}Uninstall cancelled.${NC}"
-    exit 0
-fi
 
 # Step 1: Remove symlink
 log_step "1/4" "Removing symlink..."
