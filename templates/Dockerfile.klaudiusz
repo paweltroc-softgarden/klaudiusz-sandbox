@@ -26,7 +26,7 @@ ENV npm_config_user_agent="bun"
 # Switch to root for file operations
 USER root
 
-# Copy combined CLAUDE.md (host content + sandbox info, created by klaudiusz-sandbox script)
+# Copy combined CLAUDE.md (host content + sandbox info, created by klaudiusz script)
 COPY .claude-sandbox-md /tmp/claude-md-combined
 
 # Copy plugin cache and marketplaces

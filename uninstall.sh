@@ -23,7 +23,7 @@ echo -e "${YELLOW}╚═══════════════════�
 
 echo -e "\nThis will remove:"
 echo -e "  - $SANDBOX_HOME"
-echo -e "  - ~/.local/bin/klaudiusz-sandbox symlink"
+echo -e "  - ~/.local/bin/klaudiusz symlink"
 echo -e "  - Docker image: $IMAGE_NAME"
 echo -e "  - $CLAUDE_HOME/.dockerignore"
 
@@ -36,9 +36,9 @@ fi
 
 # Step 1: Remove symlink
 log_step "1/4" "Removing symlink..."
-if [ -L "$HOME/.local/bin/klaudiusz-sandbox" ]; then
-    rm "$HOME/.local/bin/klaudiusz-sandbox"
-    log_success "Removed ~/.local/bin/klaudiusz-sandbox"
+if [ -L "$HOME/.local/bin/klaudiusz" ]; then
+    rm "$HOME/.local/bin/klaudiusz"
+    log_success "Removed ~/.local/bin/klaudiusz"
 else
     log_warn "Symlink not found"
 fi

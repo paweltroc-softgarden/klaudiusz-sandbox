@@ -58,11 +58,11 @@ mkdir -p "$SANDBOX_HOME/bin"
 log_success "Created $SANDBOX_HOME"
 
 # Download sandbox runner script
-if curl -fsSL "$REPO_URL/bin/klaudiusz-sandbox" -o "$SANDBOX_HOME/bin/klaudiusz-sandbox"; then
-    chmod +x "$SANDBOX_HOME/bin/klaudiusz-sandbox"
-    log_success "Downloaded klaudiusz-sandbox script"
+if curl -fsSL "$REPO_URL/bin/klaudiusz" -o "$SANDBOX_HOME/bin/klaudiusz"; then
+    chmod +x "$SANDBOX_HOME/bin/klaudiusz"
+    log_success "Downloaded klaudiusz script"
 else
-    log_error "Failed to download klaudiusz-sandbox script"
+    log_error "Failed to download klaudiusz script"
     exit 1
 fi
 
@@ -98,7 +98,7 @@ fi
 log_step "3/3" "Setting up command..."
 
 mkdir -p "$HOME/.local/bin"
-ln -sf "$SANDBOX_HOME/bin/klaudiusz-sandbox" "$HOME/.local/bin/klaudiusz-sandbox"
+ln -sf "$SANDBOX_HOME/bin/klaudiusz" "$HOME/.local/bin/klaudiusz"
 log_success "Created symlink in ~/.local/bin"
 
 # Check if ~/.local/bin is in PATH
@@ -114,8 +114,8 @@ echo -e "${GREEN}║   Installation complete!                 ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════╝${NC}"
 
 echo -e "\n${BLUE}Usage:${NC}"
-echo -e "  klaudiusz-sandbox              # Start sandbox in current directory"
-echo -e "  klaudiusz-sandbox --resume     # Resume previous session"
+echo -e "  klaudiusz              # Start sandbox in current directory"
+echo -e "  klaudiusz --resume     # Resume previous session"
 
 echo -e "\n${BLUE}Environment Variables:${NC}"
 echo -e "  Edit ${DIM}~/.klaudiusz-sandbox/.env${NC} to add variables like GITHUB_TOKEN"

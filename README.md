@@ -17,7 +17,7 @@ curl -fsSL https://raw.githubusercontent.com/paweltroc/klaudiusz-sandbox/main/in
 This will:
 1. Check prerequisites (Claude CLI, Docker, Docker sandbox extension)
 2. Install files to `~/.klaudiusz-sandbox/`
-3. Create `klaudiusz-sandbox` command in `~/.local/bin/`
+3. Create `klaudiusz` command in `~/.local/bin/`
 
 First run will build the Docker image (may take a few minutes).
 
@@ -25,10 +25,10 @@ First run will build the Docker image (may take a few minutes).
 
 ```bash
 # Start sandbox in current directory
-klaudiusz-sandbox
+klaudiusz
 
 # Resume previous session
-klaudiusz-sandbox --resume
+klaudiusz --resume
 ```
 
 ## Features
@@ -46,7 +46,7 @@ curl -fsSL https://raw.githubusercontent.com/paweltroc/klaudiusz-sandbox/main/un
 
 This removes:
 - `~/.klaudiusz-sandbox/` directory
-- `~/.local/bin/klaudiusz-sandbox` symlink
+- `~/.local/bin/klaudiusz` symlink
 - Docker image (`claude-dev-bun`)
 - `.dockerignore` from `~/.claude/`
 
