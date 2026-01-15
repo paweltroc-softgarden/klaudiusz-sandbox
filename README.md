@@ -43,7 +43,7 @@ klaudiusz-sandbox --resume
 If you update your settings or plugins:
 
 ```bash
-docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.bun ~/.claude
+docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.klaudiusz ~/.claude
 ```
 
 ## Uninstall

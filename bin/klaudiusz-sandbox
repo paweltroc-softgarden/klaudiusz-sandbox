@@ -9,7 +9,7 @@ const HOME = os.homedir();
 const CLAUDE_HOME = process.env.CLAUDE_HOME || path.join(HOME, '.claude');
 const SANDBOX_HOME = path.join(HOME, '.klaudiusz-sandbox');
 const IMAGE_NAME = 'claude-dev-bun';
-const DOCKERFILE_PATH = path.join(SANDBOX_HOME, 'Dockerfile.bun');
+const DOCKERFILE_PATH = path.join(SANDBOX_HOME, 'Dockerfile.klaudiusz');
 
 const colors = {
   reset: '\x1b[0m',

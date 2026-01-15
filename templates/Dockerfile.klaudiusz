@@ -1,7 +1,7 @@
 # Claude Code Sandbox - Bun + TypeScript
 #
 # Build from ~/.claude directory:
-#   docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.bun ~/.claude
+#   docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.klaudiusz ~/.claude
 #
 # Run:
 #   docker sandbox run --template claude-dev-bun claude

@@ -68,7 +68,7 @@ else
 fi
 
 # Download Dockerfile template
-if curl -fsSL "$REPO_URL/templates/Dockerfile.bun" -o "$SANDBOX_HOME/Dockerfile.bun"; then
+if curl -fsSL "$REPO_URL/templates/Dockerfile.klaudiusz" -o "$SANDBOX_HOME/Dockerfile.klaudiusz"; then
     log_success "Downloaded Dockerfile template"
 else
     log_error "Failed to download Dockerfile template"
