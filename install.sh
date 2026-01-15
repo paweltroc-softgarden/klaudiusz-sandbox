@@ -11,7 +11,7 @@ NC='\033[0m' # No Color
 
 SANDBOX_HOME="$HOME/.klaudiusz-sandbox"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
-REPO_URL="https://raw.githubusercontent.com/paweltroc/klaudiusz-sandbox/main"
+REPO_URL="https://raw.githubusercontent.com/paweltroc-softgarden/klaudiusz-sandbox/main"
 
 log_step() { echo -e "\n${BLUE}[$1]${NC} $2"; }
 log_success() { echo -e "  ${GREEN}✓${NC} $1"; }

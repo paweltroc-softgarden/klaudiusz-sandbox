@@ -11,7 +11,7 @@ Docker sandbox environment for Claude Code with Bun and TypeScript.
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/paweltroc/klaudiusz-sandbox/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/paweltroc-softgarden/klaudiusz-sandbox/main/install.sh | bash
 ```
 
 This will:
@@ -41,7 +41,7 @@ klaudiusz --resume
 ## Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/paweltroc/klaudiusz-sandbox/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/paweltroc-softgarden/klaudiusz-sandbox/main/uninstall.sh | bash
 ```
 
 This removes:
