@@ -28,7 +28,7 @@ echo -e "  - Docker image: $IMAGE_NAME"
 echo -e "  - $CLAUDE_HOME/.dockerignore"
 
 read -p $'\nContinue? [y/N] ' -n 1 -r
-echo
+echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo -e "\n${DIM}Uninstall cancelled.${NC}"
     exit 0
