@@ -11,6 +11,8 @@ const SANDBOX_HOME = path.join(HOME, '.klaudiusz-sandbox');
 const IMAGE_NAME = 'claude-dev-bun';
 const DOCKERFILE_PATH = path.join(SANDBOX_HOME, 'Dockerfile.klaudiusz');
 const ENV_FILE_PATH = path.join(SANDBOX_HOME, '.env');
+const COMBINED_CLAUDE_MD_PATH = path.join(CLAUDE_HOME, '.claude-sandbox-md');
+const HOST_CLAUDE_MD_PATH = path.join(CLAUDE_HOME, 'CLAUDE.md');
 
 const colors = {
   reset: '\x1b[0m',
@@ -47,6 +49,47 @@ function loadEnvFile() {
   return envVars;
 }
 
+const SANDBOX_INFO = `# Sandbox Environment
+
+You are running inside a Docker sandbox container. Key things to know:
+
+- This is an isolated, disposable environment - feel free to install packages and modify files freely
+- Network access is available
+- The container uses Bun as the primary JavaScript runtime (use \`bun\` instead of \`npm\`/\`npx\`)
+
+**Important:** If you encounter unexpected failures with commands that should normally work, consider that this sandbox has a predefined set of libraries and tools. Some system packages or dependencies may be missing. You can install additional packages as needed using the appropriate package manager.
+`;
+
+function createCombinedClaudeMd() {
+  let content = '';
+
+  // If host has CLAUDE.md, include it first
+  if (fs.existsSync(HOST_CLAUDE_MD_PATH)) {
+    content = fs.readFileSync(HOST_CLAUDE_MD_PATH, 'utf-8');
+    // Add separator if host content doesn't end with newlines
+    if (!content.endsWith('\n\n')) {
+      content += content.endsWith('\n') ? '\n' : '\n\n';
+    }
+    content += '---\n\n';
+  }
+
+  // Append sandbox info
+  content += SANDBOX_INFO;
+
+  // Write combined file to build context
+  fs.writeFileSync(COMBINED_CLAUDE_MD_PATH, content);
+}
+
+function cleanupCombinedClaudeMd() {
+  try {
+    if (fs.existsSync(COMBINED_CLAUDE_MD_PATH)) {
+      fs.unlinkSync(COMBINED_CLAUDE_MD_PATH);
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
+}
+
 // Check if setup has been run
 if (!fs.existsSync(DOCKERFILE_PATH)) {
   error(`Sandbox not installed. Run the install script first.`);
@@ -56,6 +99,9 @@ if (!fs.existsSync(DOCKERFILE_PATH)) {
 const args = process.argv.slice(2);
 const resume = args.includes('--resume');
 
+// Create combined CLAUDE.md (host content + sandbox info)
+createCombinedClaudeMd();
+
 // Build the image (quiet mode)
 console.log(`${colors.dim}Building image...${colors.reset}`);
 try {
@@ -63,8 +109,12 @@ try {
     stdio: ['inherit', 'ignore', 'inherit'],
   });
 } catch {
+  cleanupCombinedClaudeMd();
   error('Failed to build Docker image. Check Docker is running.');
 }
+
+// Clean up temporary combined file
+cleanupCombinedClaudeMd();
 
 // Load environment variables
 const envVars = loadEnvFile();

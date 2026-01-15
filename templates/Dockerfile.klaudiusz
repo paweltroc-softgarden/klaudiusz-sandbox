@@ -19,25 +19,15 @@ RUN bun install -g typescript
 
 ENV npm_config_user_agent="bun"
 
-# Create global CLAUDE.md to inform Claude Code about sandbox environment
-RUN mkdir -p /home/agent/.claude && cat > /home/agent/.claude/CLAUDE.md << 'EOF'
-# Sandbox Environment
-
-You are running inside a Docker sandbox container. Key things to know:
-
-- This is an isolated, disposable environment - feel free to install packages and modify files freely
-- Network access is available
-- The container uses Bun as the primary JavaScript runtime (use `bun` instead of `npm`/`npx`)
-
-**Important:** If you encounter unexpected failures with commands that should normally work, consider that this sandbox has a predefined set of libraries and tools. Some system packages or dependencies may be missing. You can install additional packages as needed using the appropriate package manager.
-EOF
-
 # ============================================================
-# Copy plugins, agents, and skills from host
+# Copy plugins, agents, skills, and CLAUDE.md from host
 # ============================================================
 
 # Switch to root for file operations
 USER root
+
+# Copy combined CLAUDE.md (host content + sandbox info, created by klaudiusz-sandbox script)
+COPY .claude-sandbox-md /tmp/claude-md-combined
 
 # Copy plugin cache and marketplaces
 COPY plugins/cache/ /tmp/claude-plugins/cache/
@@ -55,6 +45,8 @@ COPY settings.json /tmp/claude-settings.json
 # Move files to correct location and fix paths in JSON files
 # Base image uses non-root 'agent' user with home at /home/agent
 RUN mkdir -p /home/agent/.claude/plugins /home/agent/.claude/agents /home/agent/.claude/skills && \
+    # Move combined CLAUDE.md
+    cp /tmp/claude-md-combined /home/agent/.claude/CLAUDE.md && \
     # Move plugin directories
     cp -r /tmp/claude-plugins/cache /home/agent/.claude/plugins/ 2>/dev/null || true && \
     cp -r /tmp/claude-plugins/marketplaces /home/agent/.claude/plugins/ 2>/dev/null || true && \
@@ -75,7 +67,7 @@ RUN mkdir -p /home/agent/.claude/plugins /home/agent/.claude/agents /home/agent/
     # Copy settings.json to backup location (will be restored at runtime)
     cp /tmp/claude-settings.json /home/agent/.claude/.settings.json.initial 2>/dev/null || true && \
     # Cleanup temp files
-    rm -rf /tmp/claude-plugins /tmp/claude-agents /tmp/claude-skills /tmp/claude-settings.json && \
+    rm -rf /tmp/claude-plugins /tmp/claude-agents /tmp/claude-skills /tmp/claude-settings.json /tmp/claude-md-combined && \
     # Fix ownership of all copied files
     chown -R agent:agent /home/agent/.claude
 
