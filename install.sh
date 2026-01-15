@@ -20,7 +20,6 @@ log_error() { echo -e "  ${RED}✗${NC} $1"; }
 
 echo -e "\n${BLUE}╔══════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   Klaudiusz Sandbox Installer            ║${NC}"
-echo -e "${BLUE}║   Docker + Bun environment for Claude    ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
 
 # Step 1: Check prerequisites
