@@ -10,6 +10,7 @@ const CLAUDE_HOME = process.env.CLAUDE_HOME || path.join(HOME, '.claude');
 const SANDBOX_HOME = path.join(HOME, '.klaudiusz-sandbox');
 const IMAGE_NAME = 'claude-dev-bun';
 const DOCKERFILE_PATH = path.join(SANDBOX_HOME, 'Dockerfile.klaudiusz');
+const ENV_FILE_PATH = path.join(SANDBOX_HOME, '.env');
 
 const colors = {
   reset: '\x1b[0m',
@@ -20,6 +21,30 @@ const colors = {
 function error(msg) {
   console.error(`${colors.red}Error: ${msg}${colors.reset}`);
   process.exit(1);
+}
+
+function loadEnvFile() {
+  if (!fs.existsSync(ENV_FILE_PATH)) {
+    return [];
+  }
+
+  const content = fs.readFileSync(ENV_FILE_PATH, 'utf-8');
+  const envVars = [];
+
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    // Skip empty lines and comments
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+    // Match KEY=VALUE pattern
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    if (match) {
+      envVars.push(`${match[1]}=${match[2]}`);
+    }
+  }
+
+  return envVars;
 }
 
 // Check if setup has been run
@@ -41,8 +66,14 @@ try {
   error('Failed to build Docker image. Check Docker is running.');
 }
 
+// Load environment variables
+const envVars = loadEnvFile();
+
 // Run the sandbox
 const sandboxArgs = ['sandbox', 'run', '--template', IMAGE_NAME];
+for (const envVar of envVars) {
+  sandboxArgs.push('-e', envVar);
+}
 if (resume) {
   sandboxArgs.push('--resume');
 }

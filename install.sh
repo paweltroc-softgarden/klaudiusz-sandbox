@@ -74,6 +74,18 @@ else
     exit 1
 fi
 
+# Download .env template (only if not already exists)
+if [ ! -f "$SANDBOX_HOME/.env" ]; then
+    if curl -fsSL "$REPO_URL/templates/.env.template" -o "$SANDBOX_HOME/.env"; then
+        log_success "Created .env file for environment variables"
+    else
+        log_error "Failed to download .env template"
+        exit 1
+    fi
+else
+    log_warn ".env file already exists, skipping"
+fi
+
 # Download .dockerignore to Claude home
 if curl -fsSL "$REPO_URL/templates/.dockerignore" -o "$CLAUDE_HOME/.dockerignore"; then
     log_success "Downloaded .dockerignore to $CLAUDE_HOME"
@@ -104,6 +116,9 @@ echo -e "${GREEN}╚════════════════════
 echo -e "\n${BLUE}Usage:${NC}"
 echo -e "  klaudiusz-sandbox              # Start sandbox in current directory"
 echo -e "  klaudiusz-sandbox --resume     # Resume previous session"
+
+echo -e "\n${BLUE}Environment Variables:${NC}"
+echo -e "  Edit ${DIM}~/.klaudiusz-sandbox/.env${NC} to add variables like GITHUB_TOKEN"
 
 echo -e "\n${DIM}First run will build the Docker image (may take a few minutes)${NC}"
 
