@@ -26,9 +26,6 @@ First run will build the Docker image (may take a few minutes).
 ```bash
 # Start sandbox in current directory
 klaudiusz
-
-# Resume previous session
-klaudiusz --resume
 ```
 
 ## Features
