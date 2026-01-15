@@ -24,7 +24,7 @@ function error(msg) {
 
 // Check if setup has been run
 if (!fs.existsSync(DOCKERFILE_PATH)) {
-  error(`Sandbox not set up. Run 'claude-sandbox-setup' first.`);
+  error(`Sandbox not set up. Run 'klaudiusz-sandbox-setup' first.`);
 }
 
 // Parse arguments

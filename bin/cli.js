@@ -86,10 +86,10 @@ function runCommand(cmd, options = {}) {
 
 async function uninstall() {
   log('\n╔══════════════════════════════════════════╗', colors.yellow);
-  log('║   Claude Sandbox Uninstall               ║', colors.yellow);
+  log('║   Klaudiusz Sandbox Uninstall            ║', colors.yellow);
   log('╚══════════════════════════════════════════╝', colors.yellow);
 
-  const answer = await prompt('\nThis will remove all Claude Sandbox artifacts. Continue? [y/N] ');
+  const answer = await prompt('\nThis will remove all Klaudiusz Sandbox artifacts. Continue? [y/N] ');
   if (answer !== 'y' && answer !== 'yes') {
     log('\nUninstall cancelled.', colors.dim);
     return;
@@ -128,18 +128,37 @@ async function uninstall() {
   log('╚══════════════════════════════════════════╝', colors.green);
 
   log('\nTo remove the CLI commands, run:', colors.dim);
-  log('  npm uninstall -g claude-sandbox-setup', colors.dim);
+  log('  npm uninstall -g klaudiusz-sandbox', colors.dim);
   log('  # or: bun unlink (if installed via bun link)', colors.dim);
 }
 
+function showHelp() {
+  log('\nKlaudiusz Sandbox - Docker environment for Claude Code\n', colors.blue);
+  log('Usage:', colors.green);
+  log('  klaudiusz-sandbox-setup [options]\n');
+  log('Options:', colors.green);
+  log('  --help, -h       Show this help message');
+  log('  --uninstall      Remove all Klaudiusz Sandbox artifacts\n');
+  log('After setup, use:', colors.green);
+  log('  klaudiusz-sandbox              Start sandbox in current directory');
+  log('  klaudiusz-sandbox --resume    Resume previous session\n');
+  log('More info: https://github.com/anthropics/klaudiusz-sandbox', colors.dim);
+}
+
 async function main() {
+  // Check for --help flag
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    showHelp();
+    return;
+  }
+
   // Check for --uninstall flag
   if (process.argv.includes('--uninstall')) {
     return uninstall();
   }
 
   log('\n╔══════════════════════════════════════════╗', colors.blue);
-  log('║   Claude Sandbox Setup                   ║', colors.blue);
+  log('║   Klaudiusz Sandbox Setup                ║', colors.blue);
   log('║   Docker + Bun environment for Claude    ║', colors.blue);
   log('╚══════════════════════════════════════════╝', colors.blue);
 
@@ -234,8 +253,8 @@ async function main() {
   log('╚══════════════════════════════════════════╝', colors.green);
 
   log('\nUsage:', colors.blue);
-  log('  claude-sandbox              # Start sandbox in current directory');
-  log('  claude-sandbox --resume    # Resume previous session');
+  log('  klaudiusz-sandbox              # Start sandbox in current directory');
+  log('  klaudiusz-sandbox --resume    # Resume previous session');
 }
 
 main().catch((err) => {

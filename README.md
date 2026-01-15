@@ -1,6 +1,6 @@
-# claude-sandbox-setup
+# Klaudiusz Sandbox
 
-Setup Claude Code Docker sandbox with Bun and TypeScript.
+Docker sandbox environment for Claude Code with Bun and TypeScript.
 
 ## Prerequisites
 
@@ -11,23 +11,25 @@ Setup Claude Code Docker sandbox with Bun and TypeScript.
 
 ```bash
 # Install globally with bun (recommended)
-bun install -g claude-sandbox-setup
+bun install -g klaudiusz-sandbox
 
 # Or with npm
-npm install -g claude-sandbox-setup
+npm install -g klaudiusz-sandbox
 ```
 
 Then run the setup:
 
 ```bash
-claude-sandbox-setup
+klaudiusz-sandbox-setup
 ```
 
-### One-liner (without global install)
+### Without global install
+
+Run setup once, then use `bunx`/`npx` each time:
 
 ```bash
-bunx claude-sandbox-setup && bunx claude-sandbox
-# or: npx claude-sandbox-setup && npx claude-sandbox
+bunx klaudiusz-sandbox-setup   # one-time setup
+bunx klaudiusz-sandbox         # run sandbox
 ```
 
 ## What it does
@@ -42,10 +44,10 @@ After running setup:
 
 ```bash
 # Start sandbox in current directory
-claude-sandbox
+klaudiusz-sandbox
 
 # Resume previous session
-claude-sandbox --resume
+klaudiusz-sandbox --resume
 ```
 
 ## Features
@@ -65,10 +67,10 @@ docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.bun ~/.claude
 
 ## Uninstall
 
-To remove all Claude Sandbox artifacts:
+To remove all Klaudiusz Sandbox artifacts:
 
 ```bash
-claude-sandbox-setup --uninstall
+klaudiusz-sandbox-setup --uninstall
 ```
 
 This removes:
@@ -80,10 +82,10 @@ Then remove the CLI:
 
 ```bash
 # If installed with bun
-bun uninstall -g claude-sandbox-setup
+bun uninstall -g klaudiusz-sandbox
 
 # If installed with npm
-npm uninstall -g claude-sandbox-setup
+npm uninstall -g klaudiusz-sandbox
 ```
 
 ## Development
@@ -95,8 +97,8 @@ For local development:
 bun link
 
 # Now both commands are available
-claude-sandbox-setup
-claude-sandbox
+klaudiusz-sandbox-setup
+klaudiusz-sandbox
 
 # To unlink
 bun unlink
