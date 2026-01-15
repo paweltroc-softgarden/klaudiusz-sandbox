@@ -28,6 +28,17 @@ First run will build the Docker image (may take a few minutes).
 klaudiusz
 ```
 
+## Environment Variables
+
+You can pass environment variables to the sandbox by editing `~/.klaudiusz-sandbox/.env`:
+
+```bash
+GH_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ANTHROPIC_API_KEY=sk-ant-xxxxx
+```
+
+These variables will be available inside the container on startup.
+
 ## Features
 
 - **Bun runtime** - Fast JavaScript/TypeScript execution
