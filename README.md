@@ -46,6 +46,21 @@ These variables will be available inside the container on startup.
 - **Plugins & agents** - Your custom plugins, agents, and skills are available
 - **Isolated environment** - Safe to experiment without affecting your system
 
+## Troubleshooting
+
+### Changes to local skills/plugins not reflected in sandbox
+
+The sandbox container persists after exiting Claude (via `/exit`). This means changes to your local `~/.claude/` files (skills, plugins, agents) won't apply until the container is removed.
+
+### Changes made inside sandbox not persisted locally
+
+There is no volume mounting between the sandbox and your local `~/.claude/` directory. Any changes made inside the sandbox (adding plugins, skills, memories, etc.) will be lost when the container is removed and won't affect your local Claude installation.
+
+**To apply changes:**
+
+1. Open Docker Desktop and remove the `claude-sandbox-*` container
+2. Run `klaudiusz` again to apply your latest config
+
 ## Uninstall
 
 ```bash
