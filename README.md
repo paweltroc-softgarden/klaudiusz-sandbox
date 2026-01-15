@@ -10,23 +10,35 @@ Setup Claude Code Docker sandbox with Bun and TypeScript.
 ## Installation
 
 ```bash
-# Using bun (recommended)
-bunx claude-sandbox-setup
+# Install globally with bun (recommended)
+bun install -g claude-sandbox-setup
 
-# Or using npx
-npx claude-sandbox-setup
+# Or with npm
+npm install -g claude-sandbox-setup
+```
+
+Then run the setup:
+
+```bash
+claude-sandbox-setup
+```
+
+### One-liner (without global install)
+
+```bash
+bunx claude-sandbox-setup && bunx claude-sandbox
+# or: npx claude-sandbox-setup && npx claude-sandbox
 ```
 
 ## What it does
 
-1. Creates `~/.claude/` directory structure
-2. Installs the Dockerfile template
+1. Installs the Dockerfile template to `~/.klaudiusz-sandbox/`
+2. Copies `.dockerignore` to `~/.claude/`
 3. Builds the Docker image (`claude-dev-bun`)
-4. Adds `claude-sandbox` alias to your shell
 
 ## Usage
 
-After installation:
+After running setup:
 
 ```bash
 # Start sandbox in current directory
@@ -48,8 +60,46 @@ claude-sandbox --resume
 If you update your settings or plugins:
 
 ```bash
-cd ~/.claude
-docker build -t claude-dev-bun -f dockerfiles/Dockerfile.bun .
+docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.bun ~/.claude
+```
+
+## Uninstall
+
+To remove all Claude Sandbox artifacts:
+
+```bash
+claude-sandbox-setup --uninstall
+```
+
+This removes:
+- Docker image (`claude-dev-bun`)
+- Sandbox directory (`~/.klaudiusz-sandbox`)
+- `.dockerignore` from `~/.claude`
+
+Then remove the CLI:
+
+```bash
+# If installed with bun
+bun uninstall -g claude-sandbox-setup
+
+# If installed with npm
+npm uninstall -g claude-sandbox-setup
+```
+
+## Development
+
+For local development:
+
+```bash
+# Link the package globally
+bun link
+
+# Now both commands are available
+claude-sandbox-setup
+claude-sandbox
+
+# To unlink
+bun unlink
 ```
 
 ## License

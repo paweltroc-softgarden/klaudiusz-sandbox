@@ -10,7 +10,6 @@ const HOME = os.homedir();
 const CLAUDE_HOME = process.env.CLAUDE_HOME || path.join(HOME, '.claude');
 const SANDBOX_HOME = path.join(HOME, '.klaudiusz-sandbox');
 const IMAGE_NAME = 'claude-dev-bun';
-const ALIAS_NAME = 'claude-sandbox';
 
 const colors = {
   reset: '\x1b[0m',
@@ -85,14 +84,67 @@ function runCommand(cmd, options = {}) {
   });
 }
 
+async function uninstall() {
+  log('\n╔══════════════════════════════════════════╗', colors.yellow);
+  log('║   Claude Sandbox Uninstall               ║', colors.yellow);
+  log('╚══════════════════════════════════════════╝', colors.yellow);
+
+  const answer = await prompt('\nThis will remove all Claude Sandbox artifacts. Continue? [y/N] ');
+  if (answer !== 'y' && answer !== 'yes') {
+    log('\nUninstall cancelled.', colors.dim);
+    return;
+  }
+
+  // Step 1: Remove Docker image
+  logStep('1/3', 'Removing Docker image...');
+  try {
+    execSync(`docker rmi ${IMAGE_NAME}`, { stdio: 'ignore' });
+    logSuccess(`Removed image: ${IMAGE_NAME}`);
+  } catch {
+    logWarn(`Image ${IMAGE_NAME} not found or in use`);
+  }
+
+  // Step 2: Remove sandbox directory
+  logStep('2/3', 'Removing sandbox directory...');
+  if (fs.existsSync(SANDBOX_HOME)) {
+    fs.rmSync(SANDBOX_HOME, { recursive: true });
+    logSuccess(`Removed ${SANDBOX_HOME}`);
+  } else {
+    logSuccess(`${SANDBOX_HOME} not found`);
+  }
+
+  // Step 3: Remove .dockerignore from ~/.claude
+  logStep('3/3', 'Removing .dockerignore...');
+  const dockerignorePath = path.join(CLAUDE_HOME, '.dockerignore');
+  if (fs.existsSync(dockerignorePath)) {
+    fs.unlinkSync(dockerignorePath);
+    logSuccess(`Removed ${dockerignorePath}`);
+  } else {
+    logSuccess(`.dockerignore not found`);
+  }
+
+  log('\n╔══════════════════════════════════════════╗', colors.green);
+  log('║   Uninstall complete!                    ║', colors.green);
+  log('╚══════════════════════════════════════════╝', colors.green);
+
+  log('\nTo remove the CLI commands, run:', colors.dim);
+  log('  npm uninstall -g claude-sandbox-setup', colors.dim);
+  log('  # or: bun unlink (if installed via bun link)', colors.dim);
+}
+
 async function main() {
+  // Check for --uninstall flag
+  if (process.argv.includes('--uninstall')) {
+    return uninstall();
+  }
+
   log('\n╔══════════════════════════════════════════╗', colors.blue);
   log('║   Claude Sandbox Setup                   ║', colors.blue);
   log('║   Docker + Bun environment for Claude    ║', colors.blue);
   log('╚══════════════════════════════════════════╝', colors.blue);
 
   // Step 1: Check prerequisites
-  logStep('1/4', 'Checking prerequisites...');
+  logStep('1/3', 'Checking prerequisites...');
 
   if (!checkCommand('claude')) {
     logError('Claude CLI is not installed. Please install it first.');
@@ -122,7 +174,7 @@ async function main() {
   }
 
   // Step 2: Copy Dockerfile and .dockerignore
-  logStep('2/4', 'Installing Dockerfile template...');
+  logStep('2/3', 'Installing Dockerfile template...');
 
   ensureDir(SANDBOX_HOME);
 
@@ -163,7 +215,7 @@ async function main() {
   }
 
   // Step 3: Build Docker image
-  logStep('3/4', 'Building Docker image...');
+  logStep('3/3', 'Building Docker image...');
   log(`    This may take a few minutes on first run...`, colors.dim);
 
   try {
@@ -176,53 +228,14 @@ async function main() {
     process.exit(1);
   }
 
-  // Step 4: Add shell alias
-  logStep('4/4', 'Configuring shell alias...');
-
-  const shells = [
-    { name: 'zsh', rc: path.join(HOME, '.zshrc') },
-    { name: 'bash', rc: path.join(HOME, '.bashrc') },
-  ];
-
-  let aliasAdded = false;
-  const dockerfilePath = templateDst.replace(HOME, '~');
-  const claudeHomePath = CLAUDE_HOME.replace(HOME, '~');
-  const aliasCmd = `docker build -q -t ${IMAGE_NAME} -f "${dockerfilePath}" "${claudeHomePath}" && docker sandbox run --template ${IMAGE_NAME} claude`;
-  const aliasLine = `alias ${ALIAS_NAME}='${aliasCmd}'`;
-
-  for (const shell of shells) {
-    if (fs.existsSync(shell.rc)) {
-      const content = fs.readFileSync(shell.rc, 'utf8');
-      if (content.includes(ALIAS_NAME)) {
-        logSuccess(`Alias already exists in ${shell.rc}`);
-        aliasAdded = true;
-      } else {
-        const answer = await prompt(`  Add alias to ${shell.rc}? [Y/n] `);
-        if (answer !== 'n') {
-          fs.appendFileSync(shell.rc, `\n# Claude Sandbox\n${aliasLine}\n`);
-          logSuccess(`Added alias to ${shell.rc}`);
-          aliasAdded = true;
-        }
-      }
-    }
-  }
-
-  if (!aliasAdded) {
-    logWarn('No shell config found. Add this alias manually:');
-    log(`    ${aliasLine}`, colors.dim);
-  }
-
   // Done!
   log('\n╔══════════════════════════════════════════╗', colors.green);
   log('║   Setup complete!                        ║', colors.green);
   log('╚══════════════════════════════════════════╝', colors.green);
 
   log('\nUsage:', colors.blue);
-  log(`  ${ALIAS_NAME}              # Start sandbox in current directory`);
-  log(`  ${ALIAS_NAME} --resume    # Resume previous session`);
-
-  log('\nRestart your shell or run:', colors.dim);
-  log(`  source ~/.zshrc`, colors.dim);
+  log('  claude-sandbox              # Start sandbox in current directory');
+  log('  claude-sandbox --resume    # Resume previous session');
 }
 
 main().catch((err) => {

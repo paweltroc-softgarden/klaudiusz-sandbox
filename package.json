@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Setup Claude Code Docker sandbox with Bun and custom settings",
   "bin": {
-    "claude-sandbox-setup": "./bin/cli.js"
+    "claude-sandbox-setup": "./bin/cli.js",
+    "claude-sandbox": "./bin/sandbox.js"
   },
   "files": [
     "bin",

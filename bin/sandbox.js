@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+const { execSync, spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const HOME = os.homedir();
+const CLAUDE_HOME = process.env.CLAUDE_HOME || path.join(HOME, '.claude');
+const SANDBOX_HOME = path.join(HOME, '.klaudiusz-sandbox');
+const IMAGE_NAME = 'claude-dev-bun';
+const DOCKERFILE_PATH = path.join(SANDBOX_HOME, 'Dockerfile.bun');
+
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  dim: '\x1b[2m',
+};
+
+function error(msg) {
+  console.error(`${colors.red}Error: ${msg}${colors.reset}`);
+  process.exit(1);
+}
+
+// Check if setup has been run
+if (!fs.existsSync(DOCKERFILE_PATH)) {
+  error(`Sandbox not set up. Run 'claude-sandbox-setup' first.`);
+}
+
+// Parse arguments
+const args = process.argv.slice(2);
+const resume = args.includes('--resume');
+
+// Build the image (quiet mode)
+console.log(`${colors.dim}Building image...${colors.reset}`);
+try {
+  execSync(`docker build -q -t ${IMAGE_NAME} -f "${DOCKERFILE_PATH}" "${CLAUDE_HOME}"`, {
+    stdio: ['inherit', 'ignore', 'inherit'],
+  });
+} catch {
+  error('Failed to build Docker image. Check Docker is running.');
+}
+
+// Run the sandbox
+const sandboxArgs = ['sandbox', 'run', '--template', IMAGE_NAME];
+if (resume) {
+  sandboxArgs.push('--resume');
+}
+sandboxArgs.push('claude');
+
+const child = spawn('docker', sandboxArgs, {
+  stdio: 'inherit',
+});
+
+child.on('close', (code) => {
+  process.exit(code || 0);
+});
