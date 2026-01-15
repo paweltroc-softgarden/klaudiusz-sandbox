@@ -11,7 +11,7 @@ NC='\033[0m'
 
 SANDBOX_HOME="$HOME/.klaudiusz-sandbox"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
-IMAGE_NAME="claude-dev-bun"
+IMAGE_NAME="klaudiusz-sandbox"
 
 log_step() { echo -e "\n${BLUE}[$1]${NC} $2"; }
 log_success() { echo -e "  ${GREEN}✓${NC} $1"; }

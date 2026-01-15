@@ -44,7 +44,7 @@ curl -fsSL https://raw.githubusercontent.com/paweltroc-softgarden/klaudiusz-sand
 This removes:
 - `~/.klaudiusz-sandbox/` directory
 - `~/.local/bin/klaudiusz` symlink
-- Docker image (`claude-dev-bun`)
+- Docker image (`klaudiusz-sandbox`)
 - `.dockerignore` from `~/.claude/`
 
 ## License
