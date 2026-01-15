@@ -1,0 +1,22 @@
+{
+  "name": "claude-sandbox-setup",
+  "version": "1.0.0",
+  "description": "Setup Claude Code Docker sandbox with Bun and custom settings",
+  "bin": {
+    "claude-sandbox-setup": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "keywords": [
+    "claude",
+    "docker",
+    "sandbox",
+    "bun"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

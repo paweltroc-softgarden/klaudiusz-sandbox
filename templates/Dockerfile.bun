@@ -1,0 +1,131 @@
+# Claude Code Sandbox - Bun + TypeScript
+#
+# Build from ~/.claude directory:
+#   docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.bun ~/.claude
+#
+# Run:
+#   docker sandbox run --template claude-dev-bun claude
+#
+# This automatically copies your local plugins, agents, and skills into the container.
+
+FROM docker/sandbox-templates:claude-code
+
+# Ensure agent user has sudo access (may already exist in base image)
+USER root
+RUN apt-get update && apt-get install -y sudo 2>/dev/null || true && \
+    echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers 2>/dev/null || true && \
+    rm -rf /var/lib/apt/lists/*
+USER agent
+
+# Install Bun globally
+RUN npm install -g bun && bun --version
+
+# Pre-cache global tools
+RUN bun install -g typescript
+
+ENV npm_config_user_agent="bun"
+
+# Create global CLAUDE.md to inform Claude Code about sandbox environment
+RUN mkdir -p /home/agent/.claude && cat > /home/agent/.claude/CLAUDE.md << 'EOF'
+# Sandbox Environment
+
+You are running inside a Docker sandbox container. Key things to know:
+
+- This is an isolated, disposable environment - feel free to install packages and modify files freely
+- Network access is available
+- The container uses Bun as the primary JavaScript runtime (use `bun` instead of `npm`/`npx`)
+
+**Important:** If you encounter unexpected failures with commands that should normally work, consider that this sandbox has a predefined set of libraries and tools. Some system packages or dependencies may be missing. You can install additional packages as needed using the appropriate package manager.
+EOF
+
+# ============================================================
+# Copy plugins, agents, and skills from host
+# ============================================================
+
+# Switch to root for file operations
+USER root
+
+# Copy plugin cache and marketplaces
+COPY plugins/cache/ /tmp/claude-plugins/cache/
+COPY plugins/marketplaces/ /tmp/claude-plugins/marketplaces/
+COPY plugins/installed_plugins.json /tmp/claude-plugins/
+COPY plugins/known_marketplaces.json /tmp/claude-plugins/
+
+# Copy agents and skills (use wildcard pattern to handle empty dirs gracefully)
+COPY agents/ /tmp/claude-agents/
+COPY skills/ /tmp/claude-skills/
+
+# Copy settings.json (contains enabledPlugins)
+COPY settings.json /tmp/claude-settings.json
+
+# Move files to correct location and fix paths in JSON files
+# Base image uses non-root 'agent' user with home at /home/agent
+RUN mkdir -p /home/agent/.claude/plugins /home/agent/.claude/agents /home/agent/.claude/skills && \
+    # Move plugin directories
+    cp -r /tmp/claude-plugins/cache /home/agent/.claude/plugins/ 2>/dev/null || true && \
+    cp -r /tmp/claude-plugins/marketplaces /home/agent/.claude/plugins/ 2>/dev/null || true && \
+    # Fix paths in JSON files (replace macOS home path with container home path)
+    if [ -f /tmp/claude-plugins/installed_plugins.json ]; then \
+        sed 's|/Users/[^/]*/\.claude|/home/agent/.claude|g; s|/home/[^/]*/\.claude|/home/agent/.claude|g' \
+            /tmp/claude-plugins/installed_plugins.json \
+            > /home/agent/.claude/plugins/installed_plugins.json; \
+    fi && \
+    if [ -f /tmp/claude-plugins/known_marketplaces.json ]; then \
+        sed 's|/Users/[^/]*/\.claude|/home/agent/.claude|g; s|/home/[^/]*/\.claude|/home/agent/.claude|g' \
+            /tmp/claude-plugins/known_marketplaces.json \
+            > /home/agent/.claude/plugins/known_marketplaces.json; \
+    fi && \
+    # Move agents and skills
+    cp -r /tmp/claude-agents/* /home/agent/.claude/agents/ 2>/dev/null || true && \
+    cp -r /tmp/claude-skills/* /home/agent/.claude/skills/ 2>/dev/null || true && \
+    # Copy settings.json to backup location (will be restored at runtime)
+    cp /tmp/claude-settings.json /home/agent/.claude/.settings.json.initial 2>/dev/null || true && \
+    # Cleanup temp files
+    rm -rf /tmp/claude-plugins /tmp/claude-agents /tmp/claude-skills /tmp/claude-settings.json && \
+    # Fix ownership of all copied files
+    chown -R agent:agent /home/agent/.claude
+
+# Add statusLine to settings at build time
+RUN node -e " \
+    const fs = require('fs'); \
+    const path = '/home/agent/.claude/.settings.json.initial'; \
+    if (fs.existsSync(path)) { \
+        const settings = JSON.parse(fs.readFileSync(path, 'utf8') || '{}'); \
+        if (!settings.statusLine) { \
+            settings.statusLine = { type: 'command', command: 'bun x ccusage statusline', padding: 0 }; \
+            fs.writeFileSync(path, JSON.stringify(settings, null, 2)); \
+        } \
+    } \
+"
+
+# Create initialization script that applies settings at container start
+RUN cat > /usr/local/bin/claude-sandbox-init.sh << 'INITSCRIPT'
+#!/bin/bash
+BACKUP="/home/agent/.claude/.settings.json.initial"
+TARGET="/home/agent/.claude/settings.json"
+
+# Apply settings: resolve symlink if exists, otherwise copy directly
+if [ -f "$BACKUP" ]; then
+    if [ -L "$TARGET" ]; then
+        resolved=$(readlink -f "$TARGET")
+        sudo cp "$BACKUP" "$resolved" && sudo chown agent:agent "$resolved"
+    elif [ ! -f "$TARGET" ]; then
+        cp "$BACKUP" "$TARGET"
+    fi
+fi 2>/dev/null
+
+# Pre-cache ccusage
+bunx ccusage --help >/dev/null 2>&1 || true
+
+exec "$@"
+INITSCRIPT
+
+RUN chmod +x /usr/local/bin/claude-sandbox-init.sh
+
+# Switch back to agent user
+USER agent
+
+# Set our init script as entrypoint, preserving original CMD
+ENTRYPOINT ["/usr/local/bin/claude-sandbox-init.sh"]
+
+LABEL description="Claude Code sandbox with Bun and TypeScript"

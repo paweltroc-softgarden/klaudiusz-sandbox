@@ -1,0 +1,11 @@
+# Exclude everything by default (future-proof)
+*
+
+# Include only what the Dockerfile needs
+!plugins/
+!plugins/**
+!agents/
+!agents/**
+!skills/
+!skills/**
+!settings.json
