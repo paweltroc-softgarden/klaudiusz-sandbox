@@ -38,14 +38,6 @@ klaudiusz-sandbox --resume
 - **Plugins & agents** - Your custom plugins, agents, and skills are available
 - **Isolated environment** - Safe to experiment without affecting your system
 
-## Manual rebuild
-
-If you update your settings or plugins:
-
-```bash
-docker build -t claude-dev-bun -f ~/.klaudiusz-sandbox/Dockerfile.klaudiusz ~/.claude
-```
-
 ## Uninstall
 
 ```bash
